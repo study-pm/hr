@@ -47,5 +47,4 @@ This section defines the general project's structure and provides a top-level fi
 ├──📜 MainWindow.xaml.cs	# Главное окно (отделенный код)
 ├──📜 packages.config	    # Файл управления пакетами NuGet
 └──📜 README.md			    # Описание проекта и инструкции
-
 ```
