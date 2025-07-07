@@ -1,0 +1,145 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <DropShadowEffect x:Key="DropShadowEffect" Color="Black" Direction="270" ShadowDepth="4" BlurRadius="8" Opacity="0.3" />
+    <FontFamily x:Key="Roboto">pack://application:,,,/Static/Fonts/#Roboto</FontFamily>
+    <Style x:Key="WindowStyle" TargetType="Window">
+        <Setter Property="Background" Value="{DynamicResource baseBackgroundBrush}" />
+        <Setter Property="FontFamily" Value="{StaticResource Roboto}" />
+        <Setter Property="Foreground" Value="{StaticResource greyDarkBrush}" />
+    </Style>
+    <Style x:Key="HeaderStyle" TargetType="Panel">
+        <Setter Property="Control.FontFamily" Value="{StaticResource Roboto}" />
+        <Setter Property="Control.FontWeight" Value="Normal" />
+        <Setter Property="Control.FontSize" Value="13" />
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <LinearGradientBrush.GradientStops>
+                        <GradientStop Color="#1f2f49" Offset="0" />
+                        <GradientStop Color="#6285bf" Offset="1" />
+                    </LinearGradientBrush.GradientStops>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MainFrameStyle" TargetType="Frame">
+        <Setter Property="Background" Value="#fff" />
+        <Setter Property="FontSize" Value="24" />
+    </Style>
+    <Style x:Key="MainView" TargetType="ScrollViewer">
+        <Setter Property="Padding" Value="30" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+    </Style>
+    <Style x:Key="Panel" TargetType="Panel">
+        <Setter Property="Background" Value="#fff"/>
+    </Style>
+    <Style x:Key="Paragraph" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="Margin" Value="0 10" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style x:Key="NoData" TargetType="TextBlock" BasedOn="{StaticResource Paragraph}">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{DynamicResource greyDarkBrush}" />
+    </Style>
+    <Style TargetType="GridSplitter">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="ResizeBehavior" Value="PreviousAndNext"/>
+        <Setter Property="Width" Value="5"/>
+        <Style.Triggers>
+            <Trigger Property="IsDragging" Value="True">
+                <Setter Property="Background" Value="#40000000"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="RoundedShadowBorder" TargetType="Border">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="CornerRadius" Value="5"/>
+        <Setter Property="Padding" Value="30"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect Color="#264d7f7f" Direction="270" ShadowDepth="5" BlurRadius="10" Opacity="0.15"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="RoundedBorder" TargetType="Border">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="CornerRadius" Value="5"/>
+        <Setter Property="Padding" Value="5"/>
+    </Style>
+
+    <!-- Apple-style Thumb -->
+    <Style x:Key="AppleScrollThumb" TargetType="Thumb">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Border x:Name="ThumbBorder"
+                        CornerRadius="2"
+                        Background="#29000000"
+                        SnapsToDevicePixels="True"/>
+                        <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ThumbBorder" Property="Background" Value="#59000000"/>
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                            <Setter TargetName="ThumbBorder" Property="Background" Value="#7F000000"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!-- Apple-style ScrollBar -->
+    <Style TargetType="ScrollBar">
+        <Setter Property="Width" Value="8"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid Width="5" Background="Transparent">
+                        <!-- Добавляем полосу с прозрачностью 25% -->
+                        <Border Background="#10000000" CornerRadius="2" />
+                        <Track x:Name="PART_Track" IsDirectionReversed="true" Focusable="false">
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource AppleScrollThumb}" />
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Opacity="0" IsTabStop="False"/>
+                            </Track.IncreaseRepeatButton>
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Opacity="0" IsTabStop="False"/>
+                            </Track.DecreaseRepeatButton>
+                        </Track>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="PART_Track" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="Orientation" Value="Horizontal">
+                            <Setter Property="Width" Value="Auto"/>
+                            <Setter Property="Height" Value="8"/>
+                            <Setter TargetName="PART_Track" Property="LayoutTransform">
+                                <Setter.Value>
+                                    <RotateTransform Angle="-90"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="MenuItem">
+        <Setter Property="Padding" Value="5"/>
+    </Style>
+
+    <Style x:Key="TextBlockWithEllipsisStyle" TargetType="TextBlock">
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        <Setter Property="TextWrapping" Value="NoWrap" />
+        <Setter Property="ToolTip" Value="{Binding Text, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+</ResourceDictionary>

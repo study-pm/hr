@@ -1,0 +1,160 @@
+﻿<Page x:Class="HR.Pages.AuthPg"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:HR.Pages"
+      xmlns:uc="clr-namespace:HR.Controls"
+      xmlns:utils="clr-namespace:HR.Utilities"
+      mc:Ignorable="d"
+      d:DesignHeight="700" d:DesignWidth="800"
+      Title="AuthPg"
+      >
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <utils:InverseBooleanConverter x:Key="InvBoolConv"/>
+        <utils:InverseBoolToVisibilityConverter x:Key="InvBoolVis"/>
+        <utils:NotEmptyValidationRule x:Key="NotEmptyValidationRule"/>
+        <utils:NotNullOrEmptyToVisibilityConverter x:Key="NotEmptyToVisConv"/>
+    </Page.Resources>
+    <ScrollViewer Style="{StaticResource MainView}">
+    <StackPanel>
+
+        <uc:Header HeaderText="Аутентификация" Visibility="{Binding IsSecondStep, Converter={StaticResource InvBoolVis}}"></uc:Header>
+        <uc:Header HeaderText="Двухфакторная аутентификация" Visibility="{Binding IsSecondStep, Converter={StaticResource BoolToVis}}"></uc:Header>
+
+         <TextBlock Style="{StaticResource Paragraph}" Visibility="{Binding IsSecondStep, Converter={StaticResource InvBoolVis}}">
+            Введите свои учетные данные для входа. Все поля должны быть заполнены.
+        </TextBlock>
+
+        <TextBlock Style="{StaticResource Paragraph}" Visibility="{Binding IsSecondStep, Converter={StaticResource BoolToVis}}">
+            Введите шестизначный код из приложения-аутентификатора.
+        </TextBlock>
+
+            <StackPanel Style="{StaticResource Form}" Visibility="{Binding IsSecondStep, Converter={StaticResource InvBoolVis}}">
+            <StackPanel Style="{StaticResource FormElement}">
+                <Label>Пользователь</Label>
+                <TextBox x:Name="LoginTxb"
+                         IsEnabled="{Binding IsInProgress, Converter={StaticResource InvBoolConv}}"
+                         utils:ValidationHelper.AutoErrorVisibility="True"
+                         utils:ValidationHelper.EnableTouchedTracking="True"
+                         >
+                    <TextBox.Text>
+                        <Binding Path="Login" UpdateSourceTrigger="PropertyChanged"
+                                 ValidatesOnDataErrors="True" NotifyOnValidationError="True">
+                            <Binding.ValidationRules>
+                                <utils:NotEmptyValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+            </StackPanel>
+
+            <StackPanel Style="{StaticResource FormElement}">
+                <Label>Пароль</Label>
+                    <Grid>
+                        <PasswordBox x:Name="PasswordPwb" Padding="5 0 25 0"
+                                     IsEnabled="{Binding IsInProgress, Converter={StaticResource InvBoolConv}}"
+                                     Tag="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Visibility="{Binding IsPwdOn, Converter={StaticResource InvBoolVis}}"
+                                     utils:ValidationHelper.AutoErrorVisibility="True"
+                                     utils:ValidationHelper.EnableTouchedTracking="True"
+                                     PasswordChanged="PasswordPwb_PasswordChanged"
+                                     />
+                        <TextBox x:Name="PasswordTxt" Padding="5 0 25 0"
+                                 Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Visibility="{Binding IsPwdOn, Converter={StaticResource BoolToVis}}"
+                                 />
+                        <Button ToolTip="Показать пароль" HorizontalAlignment="Right"
+                                Style="{StaticResource IconButton}"
+                                Visibility="{Binding IsPwdOn, Converter={StaticResource InvBoolVis}}"
+                                Click="TogglePwdBtn_Click"
+                                >
+                            <StackPanel>
+                                <Viewbox Stretch="Fill" Width="19" Height="14">
+                                    <Path Fill="{StaticResource cyanDarkBrush}" Data="{StaticResource EyeSolidPath}"/>
+                                </Viewbox>
+                            </StackPanel>
+                        </Button>
+                        <Button ToolTip="Скрыть пароль" HorizontalAlignment="Right"  Margin="5 2 0 0"
+                                Style="{StaticResource IconButton}"
+                                Visibility="{Binding IsPwdOn, Converter={StaticResource BoolToVis}}"
+                                Click="TogglePwdBtn_Click"
+                                     >
+                            <StackPanel>
+                                <Viewbox Stretch="Fill" Width="20" Height="16">
+                                    <Path Fill="{StaticResource cyanDarkBrush}" Data="{StaticResource EyeSlashSolidPath}"/>
+                                </Viewbox>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+            </StackPanel>
+
+            <Grid Margin="0 10 0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="ResetBtn" Grid.Column="0" Content="Сброс" IsCancel="True"
+                        Style="{StaticResource BlueBtn}"
+                        IsEnabled="{Binding IsInProgress, Converter={StaticResource InvBoolConv}}"
+                        Click="ResetBtn_Click"
+                        />
+                <Button x:Name="SignInBtn" Grid.Column="2" Content="Вход" IsDefault="True"
+                        Style="{StaticResource GreenBtn}"
+                        IsEnabled="{Binding IsInProgress, Converter={StaticResource InvBoolConv}}"
+                        Click="SignInBtn_Click"
+                        />
+                    <Popup x:Name="ValidationPopup"
+                           PlacementTarget="{Binding ElementName=RootGrid}" Placement="Center"
+                           VerticalOffset="40"
+                           StaysOpen="False"
+                           AllowsTransparency="True"
+                           IsOpen="False">
+                        <Border Background="#C0FF2200" Padding="8" CornerRadius="5" >
+                            <TextBlock x:Name="ValidationMessage" Foreground="White" FontSize="12"
+                            />
+                        </Border>
+                    </Popup>
+            </Grid>
+
+
+            <TextBlock Style="{StaticResource Paragraph}" Margin="0 20 0 0">
+                Забыли пароль? Обратитесь к администратору за новым паролем.
+            </TextBlock>
+            <TextBlock Style="{StaticResource Paragraph}" Margin="0 20 0 0">
+                Нет учетной записи? Вы можете
+                <Hyperlink NavigateUri="RegisterPg.xaml"><Bold>зарегистрироваться</Bold></Hyperlink>.
+            </TextBlock>
+
+        </StackPanel>
+
+
+            <StackPanel Style="{StaticResource Form}" Visibility="{Binding IsSecondStep, Converter={StaticResource BoolToVis}}">
+                <StackPanel Style="{StaticResource FormElement}" HorizontalAlignment="Center" Margin="0"
+                            Visibility="{Binding Secret, Converter={StaticResource NotEmptyToVisConv}}"
+                            >
+                    <Label HorizontalAlignment="Center">Код</Label>
+                    <TextBox x:Name="CodeTxb" Width="70"
+                             IsEnabled="{Binding IsInProgress, Converter={StaticResource InvBoolVis}}"
+                             utils:ValidationHelper.AutoErrorVisibility="True"
+                             utils:ValidationHelper.EnableTouchedTracking="True"
+                             TextChanged="CodeTxb_TextChanged"
+                             >
+                        <TextBox.Text>
+                            <Binding Path="Code" UpdateSourceTrigger="PropertyChanged"
+                                     ValidatesOnDataErrors="True" NotifyOnValidationError="True">
+                                <Binding.ValidationRules>
+                                    <utils:DigitsOnlyValidationRule/>
+                                    <utils:ExactLengthValidationRule/>
+                                    <utils:NotEmptyValidationRule/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

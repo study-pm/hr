@@ -1,0 +1,331 @@
+﻿<local:NavCtl x:Class="HR.Controls.TopHeader"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:HR.Controls"
+             xmlns:utils="clr-namespace:HR.Utilities"
+             mc:Ignorable="d"
+             d:DesignHeight="100" d:DesignWidth="1080">
+    <local:NavCtl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Res/TopMenuStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <local:NavigationDataConverter x:Key="NavDataConv" />
+            <local:NavigationDataMultiConverter x:Key="NavigationDataConverter" />
+            <utils:CapitalizeFirstLetterConverter x:Key="CapFirstLetConv" />
+            <utils:ImagePathConverter x:Key="ImgPathConv" />
+            <utils:NotNullToBoolConverter  x:Key="NotNullToBoolConverter"/>
+            <utils:PageToIsCheckedConverter x:Key="CheckedConverter" />
+            <utils:PageToIsEnabledConverter x:Key="EnabledConverter" />
+            <BooleanToVisibilityConverter x:Key="BoolToVis" />
+            <utils:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis" />
+            <Style x:Key="SubMenuItem" TargetType="MenuItem" BasedOn="{StaticResource CheckMenuItemStyle}">
+                <Setter Property="Header" Value="{Binding Title, Converter={StaticResource CapFirstLetConv}}" />
+                <Setter Property="IsChecked" Value="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Setter Property="Command" Value="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                <Setter Property="CommandParameter">
+                    <Setter.Value>
+                        <MultiBinding Converter="{StaticResource NavigationDataConverter}">
+                            <!-- Current element from ItemsSource -->
+                            <Binding />
+                            <!-- All filters collection -->
+                            <Binding Path="DataContext.MenuVM.Filters" RelativeSource="{RelativeSource AncestorType=Window}" />
+                            <!-- Filter index from attached property -->
+                            <Binding Path="(local:MenuItemExtensions.FilterIndex)" RelativeSource="{RelativeSource AncestorType=MenuItem, AncestorLevel=1}" />
+                        </MultiBinding>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </local:NavCtl.Resources>
+    <Border CornerRadius="5">
+        <Border.Effect>
+            <DropShadowEffect Color="#264d7f7f" Direction="270" ShadowDepth="5" BlurRadius="10" Opacity="0.25"/>
+        </Border.Effect>
+        <DockPanel Style="{StaticResource HeaderStyle}">
+            <local:IconHighlightButton Width="50" Height="50" Margin="30,20" Click="HomeItem_Click" ToolTip="На главную">
+                <StackPanel>
+                    <Viewbox Stretch="Fill" Width="50" Height="50">
+                        <Path Fill="{StaticResource magentaNormalBrush}"
+                            Data="{StaticResource GraduationCapSolidPath}"/>
+                    </Viewbox>
+                </StackPanel>
+            </local:IconHighlightButton>
+
+            <local:LeftMenu x:Name="LeftMenu" VerticalAlignment="Center" />
+
+            <local:IconHighlightButton DockPanel.Dock="Right" Margin="0 20 20 10" Width="75" Height="75"
+                                       Click="AuthItem_Click" ToolTip="Войти"
+                                       Visibility="{Binding IsAuth, Source={x:Static Application.Current}, Converter={StaticResource InverseBoolToVis}}"
+                                       >
+                <StackPanel DockPanel.Dock="Right">
+                    <Viewbox Stretch="Fill" Width="40" Height="40">
+                        <Path Fill="{StaticResource cyanLightBrush}" Data="{StaticResource UserCircleRegularPath}"/>
+                    </Viewbox>
+                    <TextBlock HorizontalAlignment="Center" Margin="5" Foreground="Beige" FontSize="12" TextTrimming="CharacterEllipsis">
+                        Гость
+                    </TextBlock>
+                </StackPanel>
+            </local:IconHighlightButton>
+            <local:IconHighlightButton DockPanel.Dock="Right" Margin="0 20 20 10" Width="75" Height="75"
+                                       Click="PreferencesItem_Click" ToolTip="Перейти в настройки"
+                                       Visibility="{Binding IsAuth, Source={x:Static Application.Current}, Converter={StaticResource BoolToVis}}"
+                                       >
+                <StackPanel DockPanel.Dock="Right">
+                    <Viewbox Stretch="Fill" Width="40" Height="40">
+                        <Path Fill="{StaticResource cyanDarkBrush}" Data="{StaticResource UserCircleSolidPath}"/>
+                        <Viewbox.Style>
+                            <Style TargetType="Viewbox">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentUser.Image, Source={x:Static Application.Current}, Converter={StaticResource NotNullToBoolConverter}}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Viewbox.Style>
+                    </Viewbox>
+                    <Ellipse Width="40" Height="40">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentUser.Image, Source={x:Static Application.Current}, Converter={StaticResource NotNullToBoolConverter}}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                        <Ellipse.Fill>
+                            <ImageBrush ImageSource="{Binding CurrentUser.Image, Source={x:Static Application.Current}, Converter={StaticResource ImgPathConv}}"
+                           Stretch="UniformToFill"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
+                    <TextBlock HorizontalAlignment="Center" Margin="5" Foreground="Beige" FontSize="12" TextTrimming="CharacterEllipsis"
+                               Text="{Binding CurrentUser.Login, Source={x:Static Application.Current}}"
+                               />
+                </StackPanel>
+            </local:IconHighlightButton>
+            <WrapPanel x:Name="TopMenu" VerticalAlignment="Center">
+                <Menu Margin="30 20">
+                    <MenuItem Header="_Главная"
+                              IsEnabled="{Binding CurrentPage, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnabledConverter}, ConverterParameter=HomePg}"
+                              Command="NavigationCommands.GoToPage"
+                              CommandParameter="Pages/HomePg.xaml"
+                              CommandTarget="{Binding ElementName=mainFrame}"
+                              />
+                    <MenuItem Header="_Сотрудники" Tag="Pages/StaffPg.xaml" local:MenuItemExtensions.FilterIndex="0"
+                              IsChecked="{Binding DataContext.MenuVM.Filters[0].IsChecked, RelativeSource={RelativeSource AncestorType=Window}}"
+                              >
+                        <MenuItem.ItemsSource>
+                            <Binding Path="DataContext.MenuVM.Filters[0].Values" RelativeSource="{RelativeSource AncestorType=Window}" />
+                        </MenuItem.ItemsSource>
+                        <MenuItem.ItemContainerStyle>
+                            <StaticResource ResourceKey="SubMenuItem"/>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                    <MenuItem Header="Под_разделения" Tag="Pages/StaffPg.xaml" local:MenuItemExtensions.FilterIndex="1"
+                              IsChecked="{Binding DataContext.MenuVM.Filters[1].IsChecked, RelativeSource={RelativeSource AncestorType=Window}}"
+                              >
+                        <MenuItem.ItemsSource>
+                            <Binding Path="DataContext.MenuVM.Filters[1].Values" RelativeSource="{RelativeSource AncestorType=Window}" />
+                        </MenuItem.ItemsSource>
+                        <MenuItem.ItemContainerStyle>
+                            <StaticResource ResourceKey="SubMenuItem"/>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                    <MenuItem Header="_Должности" Tag="Pages/StaffPg.xaml" local:MenuItemExtensions.FilterIndex="2"
+                              IsChecked="{Binding DataContext.MenuVM.Filters[2].IsChecked, RelativeSource={RelativeSource AncestorType=Window}}"
+                              >
+                        <MenuItem.ItemsSource>
+                            <Binding Path="DataContext.MenuVM.Filters[2].Values" RelativeSource="{RelativeSource AncestorType=Window}" />
+                        </MenuItem.ItemsSource>
+                        <MenuItem.ItemContainerStyle>
+                            <StaticResource ResourceKey="SubMenuItem"/>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                    <MenuItem Header="Пред_меты" Tag="Pages/StaffPg.xaml" local:MenuItemExtensions.FilterIndex="3"
+                              IsChecked="{Binding DataContext.MenuVM.Filters[3].IsChecked, RelativeSource={RelativeSource AncestorType=Window}}"
+                              >
+                        <MenuItem.ItemsSource>
+                            <Binding Path="DataContext.MenuVM.Filters[3].Values" RelativeSource="{RelativeSource AncestorType=Window}" />
+                        </MenuItem.ItemsSource>
+                        <MenuItem.ItemContainerStyle>
+                            <StaticResource ResourceKey="SubMenuItem"/>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                    <MenuItem Header="_Классы" Tag="Pages/ClassesPg.xaml" local:MenuItemExtensions.FilterIndex="4"
+                              IsChecked="{Binding DataContext.MenuVM.Filters[4].IsChecked, RelativeSource={RelativeSource AncestorType=Window}}"
+                              >
+                        <MenuItem.ItemsSource>
+                            <Binding Path="DataContext.MenuVM.Filters[4].Values" RelativeSource="{RelativeSource AncestorType=Window}" />
+                        </MenuItem.ItemsSource>
+                        <MenuItem.ItemContainerStyle>
+                            <StaticResource ResourceKey="SubMenuItem"/>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                    <MenuItem Header="_Пользователь"
+                              IsChecked="{Binding CurrentPage, RelativeSource={RelativeSource AncestorType=UserControl},
+                                                  Converter={StaticResource CheckedConverter},
+                                                  ConverterParameter='AuthPg, LogPg, PreferencesPg, ProfilePg, RegisterPg, SettingsPg, UsersPg'}"
+                              >
+                        <MenuItem Header="В_ход"
+                                  Style="{StaticResource SubMenuItemStyle}"
+                                  Command="NavigationCommands.GoToPage"
+                                  CommandParameter="Pages/AuthPg.xaml"
+                                  CommandTarget="{Binding ElementName=mainFrame}"
+                                  IsEnabled="{Binding CurrentPage, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnabledConverter}, ConverterParameter=AuthPg}"
+                                  Visibility="{Binding IsAuth, Source={x:Static Application.Current}, Converter={StaticResource InverseBoolToVis}}"
+                                  >
+                            <MenuItem.Icon>
+                                <Viewbox Height="16" Width="16" ToolTip="Вход">
+                                    <Canvas Height="512" Width="512">
+                                        <Path Fill="DodgerBlue" Data="{StaticResource RightToBracketSolidPath}">
+                                            <Path.RenderTransform>
+                                                <TranslateTransform X="0" Y="0"/>
+                                            </Path.RenderTransform>
+                                        </Path>
+                                    </Canvas>
+                                </Viewbox>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="_Регистрация"
+                                  Style="{StaticResource SubMenuItemStyle}"
+                                  Command="NavigationCommands.GoToPage"
+                                  CommandParameter="Pages/RegisterPg.xaml"
+                                  CommandTarget="{Binding ElementName=mainFrame}"
+                                  IsEnabled="{Binding CurrentPage, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnabledConverter}, ConverterParameter=RegisterPg}"
+                                  Visibility="{Binding IsAuth, Source={x:Static Application.Current}, Converter={StaticResource InverseBoolToVis}}"
+                                  />
+                        <MenuItem Header="Безопасность"
+                                  Style="{StaticResource SubMenuItemStyle}"
+                                  Command="NavigationCommands.GoToPage"
+                                  CommandParameter="Pages/SettingsPg.xaml"
+                                  CommandTarget="{Binding ElementName=mainFrame}"
+                                  IsEnabled="{Binding CurrentPage, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnabledConverter}, ConverterParameter=SettingsPg}"
+                                  Visibility="{Binding IsAuth, Source={x:Static Application.Current}, Converter={StaticResource BoolToVis}}"
+                                  >
+                            <MenuItem.Icon>
+                                <Viewbox Height="16" Width="16" ToolTip="Настройки безопасности">
+                                    <Canvas Height="512" Width="512">
+                                        <Path Fill="DodgerBlue" Data="{StaticResource UserShieldSolidPath}">
+                                            <Path.RenderTransform>
+                                                <TranslateTransform X="0" Y="0"/>
+                                            </Path.RenderTransform>
+                                        </Path>
+                                    </Canvas>
+                                </Viewbox>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Настройки"
+                                  Style="{StaticResource SubMenuItemStyle}"
+                                  Command="NavigationCommands.GoToPage"
+                                  CommandParameter="Pages/PreferencesPg.xaml"
+                                  CommandTarget="{Binding ElementName=mainFrame}"
+                                  IsEnabled="{Binding CurrentPage, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnabledConverter}, ConverterParameter=PreferencesPg}"
+                                  Visibility="{Binding IsAuth, Source={x:Static Application.Current}, Converter={StaticResource BoolToVis}}"
+                                  >
+                            <MenuItem.Icon>
+                                <Viewbox Height="16" Width="16" ToolTip="Настройки приложения">
+                                    <Canvas Height="512" Width="512">
+                                        <Path Fill="DodgerBlue" Data="{StaticResource UserGearSolidPath}">
+                                            <Path.RenderTransform>
+                                                <TranslateTransform X="0" Y="0"/>
+                                            </Path.RenderTransform>
+                                        </Path>
+                                    </Canvas>
+                                </Viewbox>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Про_филь"
+                                  Style="{StaticResource SubMenuItemStyle}"
+                                  Command="NavigationCommands.GoToPage"
+                                  CommandParameter="Pages/ProfilePg.xaml"
+                                  CommandTarget="{Binding ElementName=mainFrame}"
+                                  IsEnabled="{Binding CurrentPage, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnabledConverter}, ConverterParameter=ProfilePg}"
+                                  Visibility="{Binding IsAuth, Source={x:Static Application.Current}, Converter={StaticResource BoolToVis}}"
+                                  >
+                            <MenuItem.Icon>
+                                <Viewbox Height="16" Width="16" ToolTip="Профиль">
+                                    <Canvas Height="512" Width="512">
+                                        <Path Fill="DodgerBlue" Data="{StaticResource UserTagSolidPath}">
+                                            <Path.RenderTransform>
+                                                <TranslateTransform X="0" Y="0"/>
+                                            </Path.RenderTransform>
+                                        </Path>
+                                    </Canvas>
+                                </Viewbox>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Журнал"
+                                  Style="{StaticResource SubMenuItemStyle}"
+                                  Command="NavigationCommands.GoToPage"
+                                  CommandParameter="Pages/LogPg.xaml"
+                                  CommandTarget="{Binding ElementName=mainFrame}"
+                                  IsEnabled="{Binding CurrentPage, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnabledConverter}, ConverterParameter=LogPg}"
+                                  Visibility="{Binding IsAuth, Source={x:Static Application.Current}, Converter={StaticResource BoolToVis}}"
+                                  >
+                            <MenuItem.Icon>
+                                <Viewbox ToolTip="Журнал событий">
+                                    <Canvas Height="512" Width="512">
+                                        <Path Fill="DodgerBlue" Data="{StaticResource HistorySolidPath}">
+                                            <Path.RenderTransform>
+                                                <TranslateTransform X="100" Y="0"/>
+                                            </Path.RenderTransform>
+                                        </Path>
+                                    </Canvas>
+                                </Viewbox>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Пользователи"
+                                  Style="{StaticResource SubMenuItemStyle}"
+                                  Command="NavigationCommands.GoToPage"
+                                  CommandParameter="Pages/UsersPg.xaml"
+                                  CommandTarget="{Binding ElementName=mainFrame}"
+                                  IsEnabled="{Binding CurrentPage, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnabledConverter}, ConverterParameter=UsersPg}"
+                                  Visibility="{Binding IsAuth, Source={x:Static Application.Current}, Converter={StaticResource BoolToVis}}"
+                                  >
+                            <MenuItem.Icon>
+                                <Viewbox Height="16" Width="16" ToolTip="Управление пользователями">
+                                    <Canvas Height="512" Width="512">
+                                        <Path Fill="DodgerBlue" Data="{StaticResource UsersCogSolidPath}">
+                                            <Path.RenderTransform>
+                                                <TranslateTransform X="0" Y="0"/>
+                                            </Path.RenderTransform>
+                                        </Path>
+                                    </Canvas>
+                                </Viewbox>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Вы_ход"
+                                  Style="{StaticResource SubMenuItemStyle}"
+                                  Click="LogoutItem_Click"
+                                  Visibility="{Binding IsAuth, Source={x:Static Application.Current}, Converter={StaticResource BoolToVis}}"
+                                  >
+                            <MenuItem.Icon>
+                                <Viewbox ToolTip="Выйти из системы">
+                                    <Canvas Height="512" Width="512">
+                                        <Path Fill="DodgerBlue" Data="{StaticResource RightFromBracketSolidPath}">
+                                            <Path.RenderTransform>
+                                                <TranslateTransform X="100" Y="0"/>
+                                            </Path.RenderTransform>
+                                        </Path>
+                                    </Canvas>
+                                </Viewbox>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem Header="Спра_вка"
+                              IsChecked="{Binding CurrentPage, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource CheckedConverter}, ConverterParameter='HelpPg'}"
+                              IsEnabled="{Binding CurrentPage, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnabledConverter}, ConverterParameter=HelpPg}"
+                              Command="NavigationCommands.GoToPage"
+                              CommandParameter="Pages/HelpPg.xaml"
+                              CommandTarget="{Binding ElementName=mainFrame}"
+                              />
+                </Menu>
+            </WrapPanel>
+        </DockPanel>
+    </Border>
+</local:NavCtl>
