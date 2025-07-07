@@ -1,0 +1,148 @@
+﻿<Page x:Class="HR.Pages.ProfilePg"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:HR.Pages"
+      xmlns:uc="clr-namespace:HR.Controls"
+      xmlns:utils="clr-namespace:HR.Utilities"
+      mc:Ignorable="d"
+      d:DesignHeight="800" d:DesignWidth="800"
+      Title="ProfilePg" Loaded="Page_Loaded">
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <utils:ImagePathConverter x:Key="ImgPathConv" />
+        <utils:InverseBoolToVisibilityConverter x:Key="InvBoolConv"/>
+        <utils:NotEmptyValidationRule x:Key="NotEmptyValidationRule"/>
+        <utils:StringToBoolConverter x:Key="StrToBoolConv"/>
+    </Page.Resources>
+    <ScrollViewer Style="{StaticResource MainView}">
+        <StackPanel>
+            <uc:Header HeaderText="Профиль"></uc:Header>
+            <TextBlock Style="{StaticResource Paragraph}">
+                Содержит данные, введенные пользователем для регистрации.
+                Изменение прикрепленного сотрудника невозможно.
+                Регистрационное имя должно быть уникальным и соответствовать предъявляемым требованиям
+                (не менее 4 и не более 32 символов).
+                Пароль не отображается по соображениям безопасности.
+            </TextBlock>
+            <Grid Margin="0 20 0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="200" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition MaxHeight="40" />
+                    <RowDefinition MaxHeight="40" />
+                    <RowDefinition MaxHeight="40" />
+                    <RowDefinition MaxHeight="40" />
+                </Grid.RowDefinitions>
+                <Label Style="{StaticResource FormLabel}">Логин</Label>
+                <Grid Grid.Column="1">
+                    <TextBox x:Name="LoginTxb" MaxHeight="30" Margin="0" Padding="0" BorderThickness="0,0,0,1"
+                             Style="{StaticResource FormTextBox}"
+                             IsEnabled="{Binding IsProgress, Converter={StaticResource InvBoolConv}}"
+                             utils:ValidationHelper.AutoErrorVisibility="True"
+                             utils:ValidationHelper.EnableTouchedTracking="True"
+                             >
+                        <TextBox.Text>
+                            <Binding Path="Login" UpdateSourceTrigger="PropertyChanged"
+                                     ValidatesOnDataErrors="True" NotifyOnValidationError="True"
+                                     ValidatesOnNotifyDataErrors="True"
+                                     >
+                                <Binding.ValidationRules>
+                                    <utils:MaxLengthValidationRule MaxLength="32" />
+                                    <utils:MinLengthValidationRule MinLength="4" />
+                                    <utils:NotEmptyValidationRule/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                    <Button ToolTip="Отменить изменения" HorizontalAlignment="Right" Margin="0 0 20 0" IsCancel="True"
+                            Style="{StaticResource IconButton}"
+                            Visibility="{Binding IsChanged, Converter={StaticResource BoolToVis}}"
+                            Command="{Binding ResetCmd, RelativeSource={RelativeSource AncestorType=Page}}"
+                            >
+                        <StackPanel>
+                            <Viewbox Stretch="Fill" Width="12" Height="12">
+                                <Path Fill="{StaticResource ErrorBrush}" Data="{StaticResource UndoSolidPath}"/>
+                            </Viewbox>
+                        </StackPanel>
+                    </Button>
+                    <Button ToolTip="Сохранить изменения" HorizontalAlignment="Right" IsDefault="True"
+                            Style="{StaticResource IconButton}"
+                            Visibility="{Binding IsChanged, Converter={StaticResource BoolToVis}}"
+                            Command="{Binding SubmitCmd, RelativeSource={RelativeSource AncestorType=Page}}"
+                            >
+                        <StackPanel>
+                            <Viewbox Stretch="Fill" Width="14" Height="15">
+                                <Path Fill="{StaticResource CsvBrush}" Data="{StaticResource SaveSolidPath}"/>
+                            </Viewbox>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+                <Label Style="{StaticResource FormLabel}" Grid.Row="1">Сотрудник</Label>
+                <TextBlock Grid.Row="1" Grid.Column="1"
+                           Text="{Binding Employee.FullName}" ToolTip="{Binding Employee.FullName}"
+                           Style="{StaticResource FormTextBlock}"
+                           />
+                <Label Style="{StaticResource FormLabel}" Grid.Row="2">Роль</Label>
+                <TextBlock  Grid.Row="2" Grid.Column="1"
+                            Text="{Binding Role.Name}" ToolTip="{Binding Role.Name}"
+                            Style="{StaticResource FormTextBlock}"
+                            />
+                <Label Style="{StaticResource FormLabel}" Grid.Row="3">Пароль</Label>
+                <TextBlock FontWeight="Bold" FontSize="15"  Grid.Column="1" Grid.Row="3"
+                           Style="{StaticResource FormTextBlock}" FontFamily="Arial"
+                           >
+                    <Hyperlink NavigateUri="SettingsPg.xaml">Сменить</Hyperlink>
+                </TextBlock>
+                <Grid Grid.Column="2" Margin="20 0 0 0" Grid.RowSpan="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <StackPanel Visibility="{Binding HasImage, Converter={StaticResource InvBoolConv}}">
+                        <Viewbox Stretch="Fill" Width="175" Height="175">
+                            <Path Fill="{StaticResource cyanDarkBrush}" Data="{StaticResource UserCircleSolidPath}"/>
+                        </Viewbox>
+                    </StackPanel>
+                    <Button ToolTip="Увеличить изображение"
+                            Visibility="{Binding HasImage, Converter={StaticResource BoolToVis}}"
+                            Style="{StaticResource ImgButtonStyle}"
+                            Click="EnlargeImageButton_Click"
+                            IsEnabled="{Binding Image, Converter={StaticResource StrToBoolConv}}"
+                            >
+                        <Image x:Name="UserImg" Source="{Binding Image, Converter={StaticResource ImgPathConv}}"
+                               MaxWidth="175" MaxHeight="175"
+                               />
+                    </Button>
+                    <Popup StaysOpen="False" AllowsTransparency="True" Placement="MousePoint" PopupAnimation="Fade">
+                        <Border BorderBrush="LightGray" BorderThickness="1" Background="White"
+                                CornerRadius="5" Padding="10"
+                                >
+                            <ScrollViewer MaxWidth="500" VerticalScrollBarVisibility="Hidden">
+                                <Image />
+                            </ScrollViewer>
+                        </Border>
+                    </Popup>
+                    <StackPanel Grid.Row="1" Margin="5 0">
+                        <TextBlock FontWeight="Bold" FontSize="16" HorizontalAlignment="Center"
+                                   Style="{StaticResource Paragraph}"
+                                   Visibility="{Binding HasImage, Converter={StaticResource InvBoolConv}}"
+                                   >
+                            <Hyperlink Command="{Binding AddImgCmd, RelativeSource={RelativeSource AncestorType=Page}}">Добавить фото</Hyperlink>
+                        </TextBlock>
+                        <TextBlock FontWeight="Bold" FontSize="16" HorizontalAlignment="Center"
+                                   Style="{StaticResource Paragraph}"
+                                   Visibility="{Binding HasImage, Converter={StaticResource BoolToVis}}"
+                                   >
+                            <Hyperlink Command="{Binding AddImgCmd, RelativeSource={RelativeSource AncestorType=Page}}">Сменить фото</Hyperlink>
+                        </TextBlock>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
